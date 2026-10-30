@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Examen de Teoría de Conjuntos · Cirujano Dentista</title>
+<style>
+  :root {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    color-scheme: light;
+    --azul: #0077b6; --celeste: #00b4d8; --verde: #2a9d8f; --coral: #e76f51;
+    --bg: #eef6fa; --card: #ffffff; --text: #16303d; --muted: #5b7685; --line: #d3e4ec;
+    --ok-bg: #e3f4f1; --bad-bg: #fdebe6; --shade: #00b4d8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #0e1b23; --card: #16282f; --text: #e4f1f6; --muted: #9bb4c0; --line: #2a4351;
+      --ok-bg: #153631; --bad-bg: #3a211b;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0e1b23; --card: #16282f; --text: #e4f1f6; --muted: #9bb4c0; --line: #2a4351;
+    --ok-bg: #153631; --bad-bg: #3a211b;
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; }
+  header { background: linear-gradient(120deg, var(--azul), var(--celeste)); color: #fff; padding: 22px 16px; text-align: center; }
+  header h1 { margin: 0; font-size: clamp(1.25rem, 4vw, 1.8rem); font-weight: 600; }
+  header p { margin: 4px 0 0; opacity: .92; font-size: .95rem; }
+  main { max-width: 760px; margin: 0 auto; padding: 18px 14px 40px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+  .card h2 { margin: 0 0 4px; font-size: 1.05rem; color: var(--azul); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .card h2 { color: var(--celeste); } }
+  .tema { font-size: .82rem; color: var(--muted); margin-bottom: 10px; }
+  .enun { margin: 0 0 12px; }
+  label.f { display: block; font-weight: 600; margin: 12px 0 4px; }
+  input[type=text], input[type=date], select { width: 100%; padding: 10px 12px; font: inherit; color: var(--text); background: var(--card); border: 1px solid var(--line); border-radius: 8px; }
+  input:focus, select:focus, button:focus-visible { outline: 3px solid var(--celeste); outline-offset: 1px; }
+  .opt { display: flex; gap: 10px; align-items: flex-start; padding: 9px 12px; margin: 6px 0; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
+  .opt:hover { border-color: var(--celeste); }
+  .opt input { margin-top: 5px; accent-color: var(--azul); }
+  button { font: inherit; font-weight: 600; border: 0; border-radius: 8px; padding: 12px 22px; color: #fff; background: var(--azul); cursor: pointer; }
+  button:hover { background: #005f92; }
+  button:disabled { background: var(--muted); cursor: not-allowed; }
+  .btn-main { width: 100%; margin-top: 18px; }
+  .err { color: var(--coral); font-weight: 600; margin-top: 10px; min-height: 1.2em; }
+  .fb { display: none; margin-top: 12px; padding: 12px 14px; border-radius: 8px; border-left: 5px solid; font-size: .95rem; }
+  .fb.ok { display: block; background: var(--ok-bg); border-color: var(--verde); }
+  .fb.bad { display: block; background: var(--bad-bg); border-color: var(--coral); }
+  .fb strong.t { display: block; margin-bottom: 2px; }
+  .ok strong.t { color: var(--verde); } .bad strong.t { color: var(--coral); }
+  .venn { max-width: 100%; overflow-x: auto; }
+  .venn svg { width: 100%; max-width: 380px; height: auto; display: block; margin: 0 auto 8px; }
+  #resumen { display: none; text-align: center; border: 2px solid var(--azul); }
+  #resumen .nota { font-size: 3.4rem; font-weight: 700; color: var(--azul); line-height: 1.1; }
+  .fila { display: flex; gap: 10px; align-items: center; margin: 8px 0; flex-wrap: wrap; }
+  .fila .sim { min-width: 110px; font-weight: 600; }
+  .fila select { flex: 1; min-width: 150px; width: auto; }
+  .zone { border: 1.5px dashed rgba(127,127,127,.45); border-radius: 10px; padding: 6px; min-height: 64px; position: relative; }
+  .zone b { display: block; font-size: .78rem; color: var(--muted); }
+  .zone.over { border-color: var(--celeste); background: rgba(0,180,216,.12); }
+  .zc { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .chip { background: var(--azul); color: #fff; padding: 6px 10px; border-radius: 16px; font-size: .85rem; cursor: grab; user-select: none; -webkit-user-select: none; max-width: 100%; overflow-wrap: anywhere; }
+  .chip.sel { outline: 3px solid var(--coral); }
+  .uni { border: 2px solid var(--azul); border-radius: 10px; padding: 8px; margin-top: 10px; }
+  .ulab { font-weight: 700; color: var(--azul); }
+  .vgrid { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; min-height: 150px; margin: 6px 0; padding: 8px 0; }
+  .vgrid svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .vgrid .zone { background: transparent; }
+  .vhelp { font-size: .82rem; color: var(--muted); margin: 0 0 8px; }
+  .hidden { display: none; }
+  #envio { font-size: .85rem; color: var(--muted); margin-top: 8px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🦷 Examen de Teoría de Conjuntos</h1>
+  <p>Lógica y Conjuntos · Cirujano Dentista · 1.er semestre</p>
+</header>
+
+<main>
+  <!-- 1. REGISTRO -->
+  <section id="registro" class="card">
+    <h2>Datos del alumno</h2>
+    <p class="tema">Completa todos los campos para habilitar el examen.</p>
+    <label class="f" for="nombre">Nombre completo</label>
+    <input type="text" id="nombre" autocomplete="name">
+    <label class="f" for="matricula">Matrícula</label>
+    <input type="text" id="matricula">
+    <label class="f" for="grupo">Grupo</label>
+    <select id="grupo">
+      <option value="">Selecciona tu grupo</option>
+      <option value="1H7">1H7</option>
+      <option value="1H8">1H8</option>
+    </select>
+    <label class="f" for="fecha">Fecha de aplicación</label>
+    <input type="date" id="fecha">
+    <div class="err" id="errRegistro" role="alert"></div>
+    <button class="btn-main" id="btnComenzar">Comenzar Examen</button>
+  </section>
+
+  <!-- EXAMEN -->
+  <section id="examen" class="hidden">
+    <div id="preguntas"></div>
+    <button class="btn-main" id="btnEnviar">Enviar y Calificar Examen</button>
+    <div id="resumen" class="card">
+      <h2>Resultado final</h2>
+      <div class="nota" id="notaFinal">0</div>
+      <p id="mensajeFinal"></p>
+      <p id="infraccionesFinal"></p>
+      <p id="envio"></p>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ============ ESTADO GLOBAL ============ */
+let examenIniciado = false;
+let infracciones = 0;
+let alumno = {};
+
+/* ============ BANCO DE PREGUNTAS ============ */
+/* correcta: índice (select/radio), arreglo de índices (checkbox) o número (text) */
+const VENN_SVG = `
+<svg viewBox="0 0 360 200" role="img" aria-label="Diagrama de Venn con dos conjuntos R y E dentro del universo U; solo la parte de R que no se cruza con E está sombreada">
+  <rect x="4" y="4" width="352" height="192" rx="8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+  <text x="14" y="24" font-size="14" fill="currentColor">U (pacientes)</text>
+  <circle cx="135" cy="105" r="65" style="fill:var(--shade)"/>
+  <circle cx="225" cy="105" r="65" style="fill:var(--card)"/>
+  <circle cx="135" cy="105" r="65" fill="none" stroke="#0077b6" stroke-width="2.5"/>
+  <circle cx="225" cy="105" r="65" fill="none" stroke="#e76f51" stroke-width="2.5"/>
+  <text x="95" y="45" font-size="18" font-weight="700" fill="#0077b6">R</text>
+  <text x="255" y="45" font-size="18" font-weight="700" fill="#e76f51">E</text>
+</svg>`;
+
+const PREGUNTAS = [
+  { tipo: "select", tema: "Escritura por comprensión",
+    texto: "El set de diagnóstico básico es D = {espejo bucal, explorador, pinzas de curación}. ¿Cuál es su descripción correcta por comprensión?",
+    ops: ["D = {x | x es un instrumento del set básico de exploración clínica}",
+          "D = {x | x es un material de obturación}",
+          "D = {x ∈ ℕ | x < 3}",
+          "D = {x | x es una pieza dental permanente}"],
+    ok: 0,
+    exp: "Escribir por comprensión es dar la propiedad que cumplen todos los elementos. Espejo, explorador y pinzas comparten la propiedad de ser instrumentos de exploración clínica." },
+
+  { tipo: "checkbox", tema: "Operación: intersección",
+    texto: "A = {Streptococcus mutans, Lactobacillus, Porphyromonas gingivalis, Actinomyces} y B = {Streptococcus mutans, Candida albicans, Porphyromonas gingivalis, Fusobacterium nucleatum}. Selecciona todos los elementos de A ∩ B.",
+    ops: ["Streptococcus mutans", "Lactobacillus", "Porphyromonas gingivalis", "Actinomyces", "Candida albicans", "Fusobacterium nucleatum"],
+    ok: [0, 2],
+    exp: "A ∩ B contiene solo los elementos que pertenecen a ambos conjuntos: S. mutans y P. gingivalis." },
+
+  { tipo: "radio", tema: "Operación: diferencia",
+    texto: "Universo U = {incisivo central, incisivo lateral, canino, 1.er premolar, 2.º premolar, 1.er molar, 2.º molar, 3.er molar} (un cuadrante permanente) y A = {incisivo central, incisivo lateral, canino}. ¿Cuál es U − A?",
+    ops: ["{incisivo central, incisivo lateral, canino}",
+          "{1.er premolar, 2.º premolar, 1.er molar, 2.º molar}",
+          "{1.er premolar, 2.º premolar, 1.er molar, 2.º molar, 3.er molar}",
+          "∅"],
+    ok: 2,
+    exp: "U − A conserva los elementos de U que no están en A: los 2 premolares y los 3 molares (5 elementos)." },
+
+  { tipo: "radio", tema: "Diagramas de Venn", extra: VENN_SVG,
+    texto: "R = pacientes con restauración de resina; E = pacientes con endodoncia. ¿Qué región representa el área sombreada?",
+    ops: ["R ∩ E", "R − E (R ∩ E′)", "E − R", "R ∪ E"],
+    ok: 1,
+    exp: "Está sombreada la parte de R que no se traslapa con E: pacientes con resina que no tienen endodoncia, es decir, R − E." },
+
+  { tipo: "radio", tema: "Álgebra de conjuntos · Leyes de De Morgan",
+    texto: "Con R = pacientes con resina y E = pacientes con endodoncia dentro del universo U de la clínica, el grupo “sin resina y sin endodoncia” se representa como (R ∪ E)′. ¿Cuál expresión es equivalente a (R ∪ E)′?",
+    ops: ["R′ ∪ E′", "R′ ∩ E′", "R ∩ E′", "(R ∩ E)′"],
+    ok: 1,
+    exp: "Ley de De Morgan: (R ∪ E)′ = R′ ∩ E′. No tener ninguno de los dos tratamientos equivale a no tener resina Y no tener endodoncia." },
+
+  { tipo: "text", tema: "Cardenalidad",
+    texto: "Un conjunto de insumos de bioseguridad se registra como M = {guantes, cubrebocas, careta, guantes, bata, gorro, bata}. ¿Cuánto vale |M|?",
+    ok: 5,
+    exp: "En un conjunto no se cuentan repetidos. Los elementos distintos son guantes, cubrebocas, careta, bata y gorro, así que |M| = 5." },
+
+  { tipo: "text", tema: "Cardenalidad del conjunto potencia",
+    texto: "El kit quirúrgico es F = {redonda, fisura, cono invertido, pera, llama, diamante}. Calcula |P(F)|.",
+    ok: 64,
+    exp: "|P(F)| = 2ⁿ = 2⁶ = 64 subconjuntos posibles, incluyendo ∅ y el propio F." },
+
+  { tipo: "radio", tema: "Producto cartesiano",
+    texto: "D = {incisivo, canino, molar} y A = {superior, inferior}. ¿Cuál afirmación sobre D × A es correcta?",
+    ops: ["|D × A| = 5 y (superior, molar) ∈ D × A",
+          "|D × A| = 6 y (canino, inferior) ∈ D × A",
+          "|D × A| = 6 y (inferior, incisivo) ∈ D × A",
+          "|D × A| = 2 y (molar, molar) ∈ D × A"],
+    ok: 1,
+    exp: "|D × A| = 3 · 2 = 6. Los pares ordenados llevan primero un elemento de D y luego uno de A: (canino, inferior) es válido; (superior, molar) e (inferior, incisivo) tienen el orden invertido." },
+
+  { tipo: "text", tema: "Operación: unión",
+    texto: "Sean A = {caries, gingivitis, pulpitis} y B = {gingivitis, periodontitis} dos conjuntos de diagnósticos. Calcula |A ∪ B|.",
+    ok: 4, exp: "" },
+
+  { tipo: "radio", tema: "Subconjuntos",
+    texto: "Sean S = {amalgama, resina, ionómero de vidrio} y T = {resina, ionómero de vidrio} materiales de restauración. ¿Cuál afirmación es verdadera?",
+    ops: ["T ⊆ S", "S ⊆ T", "amalgama ∈ T", "T ∩ S = ∅"],
+    ok: 0, exp: "" },
+
+  { tipo: "checkbox", tema: "Complemento",
+    texto: "Sea U = {amalgama, resina, ionómero, porcelana, zirconia} el universo de materiales y A = {amalgama, resina}. Selecciona todos los elementos de A′.",
+    ops: ["amalgama", "resina", "ionómero", "porcelana", "zirconia"],
+    ok: [2, 3, 4], exp: "" },
+
+  { tipo: "text", tema: "Cardenalidad de la unión",
+    texto: "En una clínica, 25 pacientes recibieron resina (R), 18 recibieron endodoncia (E) y 9 recibieron ambos tratamientos. ¿Cuántos pacientes recibieron al menos uno de los dos tratamientos?",
+    ok: 34, exp: "" },
+
+  { tipo: "venn", tema: "Diagrama de Venn interactivo", n: ["A", "B"],
+    texto: "Sean A = bacterias cariogénicas = {S. mutans, Lactobacillus, Actinomyces} y B = bacterias periodontopatógenas = {Actinomyces, P. gingivalis, F. nucleatum}. En el universo U también está Candida albicans. Coloca cada elemento en la región que le corresponde.",
+    chips: [["S. mutans", "A"], ["Lactobacillus", "A"], ["Actinomyces", "AB"], ["P. gingivalis", "B"], ["F. nucleatum", "B"], ["Candida albicans", "U"]] },
+
+  { tipo: "match", tema: "Notación de conjuntos",
+    texto: "Relaciona cada símbolo con su significado.",
+    filas: ["∩", "∈", "∪", "⊆"],
+    opsM: ["pertenece a", "es subconjunto de", "unión", "intersección", "complemento"],
+    ok: [3, 0, 2, 1] },
+
+  { tipo: "vf", tema: "Verdadero o falso",
+    texto: "Sea A = {incisivo, canino}. Indica si cada afirmación es verdadera o falsa.",
+    filas: ["∅ ⊆ A", "{canino} ∈ A", "|P(A)| = 4", "canino ∈ A"],
+    ok: ["V", "F", "V", "V"] },
+
+  { tipo: "venn", tema: "Diagrama de Venn interactivo", n: ["R", "E"],
+    texto: "R = pacientes con resina = {Ana, Beto, Carla}; E = pacientes con endodoncia = {Carla, Diego}; U = {Ana, Beto, Carla, Diego, Elena}. Arrastra cada paciente a su región.",
+    chips: [["Ana", "A"], ["Beto", "A"], ["Carla", "AB"], ["Diego", "B"], ["Elena", "U"]] }
+];
+
+/* ============ DIAGRAMA DE VENN INTERACTIVO ============ */
+let chipSel = null;
+let bloqueado = false;
+
+function vennHTML(i, p) {
+  const chips = p.chips.map((c, k) =>
+    `<span class="chip" draggable="true" id="c${i}_${k}" data-z="bank" data-ok="${c[1]}">${c[0]}</span>`).join("");
+  return `<p class="vhelp">Arrastra cada elemento a su región. En el celular: toca el elemento y luego toca la región.</p>
+  <div class="vbox" data-q="${i}">
+    <div class="zone" data-zone="bank"><b>Elementos disponibles</b><div class="zc">${chips}</div></div>
+    <div class="uni"><div class="ulab">U</div>
+      <div class="vgrid">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <ellipse cx="36" cy="50" rx="32" ry="46" fill="#0077b6" fill-opacity=".10" stroke="#0077b6" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
+          <ellipse cx="64" cy="50" rx="32" ry="46" fill="#e76f51" fill-opacity=".10" stroke="#e76f51" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
+        </svg>
+        <div class="zone" data-zone="A"><b>Solo ${p.n[0]}</b><div class="zc"></div></div>
+        <div class="zone" data-zone="AB"><b>${p.n[0]} ∩ ${p.n[1]}</b><div class="zc"></div></div>
+        <div class="zone" data-zone="B"><b>Solo ${p.n[1]}</b><div class="zc"></div></div>
+      </div>
+      <div class="zone" data-zone="U"><b>Fuera de ${p.n[0]} y ${p.n[1]}</b><div class="zc"></div></div>
+    </div>
+  </div>`;
+}
+
+function moverChip(chip, zona) {
+  zona.querySelector(".zc").appendChild(chip);
+  chip.dataset.z = zona.dataset.zone;
+}
+
+function initVenn(i) {
+  const box = document.querySelector(`.vbox[data-q="${i}"]`);
+  box.addEventListener("click", e => {
+    if (bloqueado) return;
+    const chip = e.target.closest(".chip");
+    if (chip) {
+      if (chipSel) chipSel.classList.remove("sel");
+      chipSel = (chipSel === chip) ? null : chip;
+      if (chipSel) chipSel.classList.add("sel");
+      return;
+    }
+    const zona = e.target.closest(".zone");
+    if (zona && chipSel) {
+      moverChip(chipSel, zona);
+      chipSel.classList.remove("sel");
+      chipSel = null;
+    }
+  });
+  box.addEventListener("dragstart", e => {
+    const c = e.target.closest(".chip");
+    if (!c || bloqueado) { e.preventDefault(); return; }
+    e.dataTransfer.setData("text/plain", c.id);
+  });
+  box.addEventListener("dragover", e => {
+    const z = e.target.closest(".zone");
+    if (z && !bloqueado) { e.preventDefault(); z.classList.add("over"); }
+  });
+  box.addEventListener("dragleave", e => {
+    const z = e.target.closest(".zone");
+    if (z) z.classList.remove("over");
+  });
+  box.addEventListener("drop", e => {
+    e.preventDefault();
+    const z = e.target.closest(".zone");
+    if (!z || bloqueado) return;
+    z.classList.remove("over");
+    const c = document.getElementById(e.dataTransfer.getData("text/plain"));
+    if (c) moverChip(c, z);
+  });
+}
+
+/* ============ RENDER ============ */
+function renderPreguntas() {
+  const cont = document.getElementById("preguntas");
+  cont.innerHTML = PREGUNTAS.map((p, i) => {
+    let campo = "";
+    if (p.tipo === "select") {
+      campo = `<select id="q${i}"><option value="">Selecciona una opción</option>` +
+        p.ops.map((o, j) => `<option value="${j}">${o}</option>`).join("") + `</select>`;
+    } else if (p.tipo === "radio" || p.tipo === "checkbox") {
+      campo = p.ops.map((o, j) =>
+        `<label class="opt"><input type="${p.tipo}" name="q${i}" value="${j}"><span>${o}</span></label>`).join("");
+    } else if (p.tipo === "match") {
+      campo = p.filas.map((f, k) => `<div class="fila"><span class="sim">${f}</span><select id="q${i}_${k}"><option value="">Selecciona</option>${p.opsM.map((o, j) => `<option value="${j}">${o}</option>`).join("")}</select></div>`).join("");
+    } else if (p.tipo === "vf") {
+      campo = p.filas.map((f, k) => `<div class="fila"><span class="sim">${f}</span><select id="q${i}_${k}"><option value="">Selecciona</option><option value="V">Verdadero</option><option value="F">Falso</option></select></div>`).join("");
+    } else if (p.tipo === "venn") {
+      campo = vennHTML(i, p);
+    } else {
+      campo = `<input type="text" id="q${i}" inputmode="numeric" placeholder="Escribe un número entero" autocomplete="off">`;
+    }
+    return `<article class="card" id="card${i}">
+      <h2>Pregunta ${i + 1}</h2>
+      <div class="tema">${p.tema}</div>
+      <p class="enun">${p.texto}</p>
+      ${p.extra ? `<div class="venn">${p.extra}</div>` : ""}
+      ${campo}
+    </article>`;
+  }).join("");
+  PREGUNTAS.forEach((p, i) => { if (p.tipo === "venn") initVenn(i); });
+  // Los chips arrancan en el banco de elementos
+}
+
+/* ============ REGISTRO ============ */
+function iniciarExamen() {
+  const nombre = document.getElementById("nombre").value.trim();
+  const matricula = document.getElementById("matricula").value.trim();
+  const grupo = document.getElementById("grupo").value;
+  const fecha = document.getElementById("fecha").value;
+  const err = document.getElementById("errRegistro");
+  if (!nombre || !matricula || !grupo || !fecha) {
+    err.textContent = "Completa nombre, matrícula, grupo y fecha para comenzar.";
+    return;
+  }
+  alumno = { nombre, matricula, grupo, fecha };
+  err.textContent = "";
+  document.getElementById("registro").classList.add("hidden");
+  renderPreguntas();
+  document.getElementById("examen").classList.remove("hidden");
+  examenIniciado = true;
+  window.scrollTo(0, 0);
+}
+document.getElementById("btnComenzar").addEventListener("click", iniciarExamen);
+
+/* ============ 2. DETECTOR DE SALIDAS ============ */
+document.addEventListener("visibilitychange", () => {
+  if (examenIniciado && document.hidden) {
+    infracciones++;
+    alert("¡Atención! Las salidas del examen quedan registradas en el sistema del profesor");
+  }
+});
+
+/* ============ 5. CALIFICACIÓN ============ */
+function respuestaCorrectaTexto(p) {
+  if (p.tipo === "checkbox") return p.ok.map(k => p.ops[k]).join("; ");
+  if (p.tipo === "text") return String(p.ok);
+  return p.ops[p.ok];
+}
+
+function evaluar(p, i) {
+  if (p.tipo === "select") {
+    return document.getElementById("q" + i).value === String(p.ok);
+  }
+  if (p.tipo === "radio") {
+    const s = document.querySelector(`input[name="q${i}"]:checked`);
+    return !!s && Number(s.value) === p.ok;
+  }
+  if (p.tipo === "checkbox") {
+    const sel = [...document.querySelectorAll(`input[name="q${i}"]:checked`)].map(e => Number(e.value)).sort();
+    return sel.length === p.ok.length && sel.every((v, k) => v === p.ok[k]);
+  }
+  if (p.tipo === "venn") {
+    return [...document.querySelectorAll(`#card${i} .chip`)].every(c => c.dataset.z === c.dataset.ok);
+  }
+  if (p.tipo === "match" || p.tipo === "vf") {
+    return p.ok.every((v, k) => document.getElementById(`q${i}_${k}`).value === String(v));
+  }
+  const v = document.getElementById("q" + i).value.trim();
+  return /^-?\d+$/.test(v) && parseInt(v, 10) === p.ok;
+}
+
+function calificarExamen() {
+  examenIniciado = false; // desactiva el detector anti-trampas
+  bloqueado = true;
+  document.querySelectorAll(".chip").forEach(c => { c.draggable = false; c.style.cursor = "default"; });
+  const btn = document.getElementById("btnEnviar");
+  btn.disabled = true;
+
+  let aciertos = 0;
+  PREGUNTAS.forEach((p, i) => {
+    const bien = evaluar(p, i);
+    if (bien) aciertos++;
+    document.querySelectorAll(`#card${i} input, #card${i} select`).forEach(el => el.disabled = true);
+  });
+
+  const nota = Math.round((aciertos / PREGUNTAS.length) * 100);
+  let msg;
+  if (nota >= 90) msg = "Excelente dominio de la teoría de conjuntos aplicada a la clínica.";
+  else if (nota >= 70) msg = "Buen desempeño.";
+  else if (nota >= 60) msg = "Aprobatorio, pero conviene reforzar operaciones y notación.";
+  else msg = "Necesitas reforzar los fundamentos. Consulta a tu profesor.";
+
+  document.getElementById("notaFinal").textContent = nota + " / 100";
+  document.getElementById("mensajeFinal").textContent = msg;
+  document.getElementById("infraccionesFinal").textContent = `Salidas del examen registradas: ${infracciones}`;
+  const res = document.getElementById("resumen");
+  res.style.display = "block";
+  res.scrollIntoView({ behavior: "smooth", block: "center" });
+
+  enviarAGoogleSheets({
+    nombre: alumno.nombre,
+    matricula: alumno.matricula,
+    grupo: alumno.grupo,
+    fecha: alumno.fecha,
+    calificacion: nota,
+    infracciones: infracciones
+  });
+}
+document.getElementById("btnEnviar").addEventListener("click", calificarExamen);
+
+/* ============ 6. ENVÍO A GOOGLE SHEETS (vía Google Apps Script) ============
+ * CONFIGURACIÓN EN GOOGLE:
+ * 1) En tu hoja de cálculo: Extensiones > Apps Script, y pega este código:
+ *      function doPost(e) {
+ *        var d = JSON.parse(e.postData.contents);
+ *        SpreadsheetApp.getActiveSpreadsheet().getSheets()[0].appendRow(
+ *          [new Date(), d.nombre, d.matricula, d.grupo, d.fecha, d.calificacion, d.infracciones]);
+ *        return ContentService.createTextOutput("ok");
+ *      }
+ * 2) Implementar > Nueva implementación > Aplicación web.
+ *    Ejecutar como: Yo. Quién tiene acceso: Cualquier persona.
+ * 3) Copia la URL que termina en /exec y pégala en URL_SCRIPT.
+ * Las claves del objeto "datos" (nombre, matricula, grupo, fecha, calificacion,
+ * infracciones) deben coincidir con las que lee doPost.
+ * NOTA: con mode "no-cors" no se puede leer la respuesta; si no hay error de
+ * red se considera enviado. Algunas vistas previas bloquean solicitudes a
+ * sitios externos: aloja el HTML en tu sitio o ábrelo localmente.
+ */
+async function enviarAGoogleSheets(datos) {
+  const estado = document.getElementById("envio");
+  const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwQIcfVVMDljgh_mFDS_9aus8fFgfOEd7SdYw2XmY075CdIhPMkpMR4i14wMzlrW2yx/exec";
+
+  if (!URL_SCRIPT || URL_SCRIPT.includes("TU_URL_DE_APPS_SCRIPT")) {
+    estado.textContent = "Envío a Google Sheets sin configurar (el profesor debe completar la URL del script).";
+    return false;
+  }
+
+  try {
+    await fetch(URL_SCRIPT, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(datos)
+    });
+    estado.textContent = "Resultado enviado al profesor.";
+    return true;
+  } catch (error) {
+    estado.textContent = "No se pudo enviar el resultado. Avisa a tu profesor.";
+    console.error("Error en el envío:", error);
+    return false;
+  }
+}
+</script>
+</body>
+</html>
